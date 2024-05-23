@@ -45,6 +45,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, handleClose, editUser, onSubm
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         fullWidth
+                        sx={{mt:2}}
                     />
                     <TextField
                         label="Last Name"
