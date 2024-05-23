@@ -9,7 +9,10 @@ import {
     setPage,
     getPage,
     getTotalPages,
-    deleteUser
+    deleteUser,
+    updateUser,
+    createUser,
+    User
 } from '@/lib/features/users/userSlice';
 import { AppDispatch, RootState } from '@/lib/store';
 import {
@@ -38,11 +41,11 @@ import { useRouter } from 'next/navigation';
 const UserList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const router = useRouter();
-    const users = useSelector((state: RootState) => selectAllUsers(state));
-    const status = useSelector((state: RootState) => getUserStatus(state));
-    const error = useSelector((state: RootState) => getUserError(state));
-    const page = useSelector((state: RootState) => getPage(state));
-    const totalPages = useSelector((state: RootState) => getTotalPages(state));
+    const users = useSelector(selectAllUsers);
+    const status = useSelector(getUserStatus);
+    const error = useSelector(getUserError);
+    const page = useSelector(getPage);
+    const totalPages = useSelector(getTotalPages);
 
     const [openForm, setOpenForm] = useState(false);
     const [editUser, setEditUser] = useState<{ id: number; first_name: string; last_name: string; email: string; avatar: string } | undefined>(undefined);
@@ -77,6 +80,15 @@ const UserList: React.FC = () => {
         setOpenForm(false);
     };
 
+    const handleSubmit = (user: Omit<User, 'id'>, id?: number) => {
+        if (id) {
+            dispatch(updateUser({ id, user })).then(() => dispatch(fetchUsers(page)));
+        } else {
+            dispatch(createUser(user)).then(() => dispatch(fetchUsers(page)));
+        }
+        handleCloseForm();
+    };
+
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
@@ -85,7 +97,7 @@ const UserList: React.FC = () => {
             <Button variant="contained" color="primary" onClick={handleCreateUser} sx={{ mb: 2 }}>
                 Add User
             </Button>
-            <UserForm open={openForm} handleClose={handleCloseForm} editUser={editUser} />
+            <UserForm open={openForm} handleClose={handleCloseForm} editUser={editUser} onSubmit={handleSubmit} />
             {status === 'loading' ? (
                 <TableContainer component={Paper}>
                     <Table>
