@@ -12,7 +12,6 @@ import {
 } from '@/lib/features/users/userSlice';
 import { AppDispatch, RootState } from '@/lib/store';
 import {
-    CircularProgress,
     Box,
     Table,
     TableBody,
@@ -25,11 +24,15 @@ import {
     Avatar,
     Container,
     Typography,
-    Skeleton
+    Skeleton,
+    IconButton
 } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useRouter } from 'next/navigation';
 
 const UserList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
+    const router = useRouter();
     const users = useSelector((state: RootState) => selectAllUsers(state));
     const status = useSelector((state: RootState) => getUserStatus(state));
     const error = useSelector((state: RootState) => getUserError(state));
@@ -42,6 +45,10 @@ const UserList: React.FC = () => {
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         dispatch(setPage(value));
+    };
+
+    const handleViewUser = (userId: number) => {
+        router.push(`/user/${userId}`);
     };
 
     return (
@@ -59,6 +66,7 @@ const UserList: React.FC = () => {
                                 <TableCell>First Name</TableCell>
                                 <TableCell>Last Name</TableCell>
                                 <TableCell>Email</TableCell>
+                                <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -79,6 +87,9 @@ const UserList: React.FC = () => {
                                     <TableCell>
                                         <Skeleton variant="text" width={150} />
                                     </TableCell>
+                                    <TableCell>
+                                        <Skeleton variant="text" width={50} />
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -95,6 +106,7 @@ const UserList: React.FC = () => {
                                     <TableCell>First Name</TableCell>
                                     <TableCell>Last Name</TableCell>
                                     <TableCell>Email</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -107,6 +119,11 @@ const UserList: React.FC = () => {
                                         <TableCell>{user.first_name}</TableCell>
                                         <TableCell>{user.last_name}</TableCell>
                                         <TableCell>{user.email}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => handleViewUser(user.id)}>
+                                                <VisibilityIcon />
+                                            </IconButton>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
