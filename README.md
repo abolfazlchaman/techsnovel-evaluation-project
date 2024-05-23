@@ -47,7 +47,7 @@ npm run dev
 Open your browser and navigate to http://localhost:3000.
 
 ```
-
+```bash
 Project Structure (Summary - not all files included)
 
 bash
@@ -77,3 +77,5 @@ user-management-app/
 ├── package.json                  # NPM package configuration
 ├── README.md                     # Project README file
 └── tsconfig.json                 # TypeScript configuration
+
+```
