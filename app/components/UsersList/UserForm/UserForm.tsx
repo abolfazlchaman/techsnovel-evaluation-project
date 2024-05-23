@@ -1,18 +1,16 @@
 // components/UserForm.tsx
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { createUser, updateUser, User } from '@/lib/features/users/userSlice';
-import { AppDispatch } from '@/lib/store';
+import { User } from '@/lib/features/users/userSlice';
 import { Box, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 interface UserFormProps {
     open: boolean;
     handleClose: () => void;
     editUser?: { id: number; first_name: string; last_name: string; email: string; avatar: string };
+    onSubmit: (user: Omit<User, 'id'>, id?: number) => void;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ open, handleClose, editUser }) => {
-    const dispatch = useDispatch<AppDispatch>();
+const UserForm: React.FC<UserFormProps> = ({ open, handleClose, editUser, onSubmit }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -34,12 +32,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, handleClose, editUser }) => {
 
     const handleSubmit = () => {
         const user: Omit<User, 'id'> = { first_name: firstName, last_name: lastName, email, avatar };
-        if (editUser) {
-            dispatch(updateUser({ id: editUser.id, user }));
-        } else {
-            dispatch(createUser(user));
-        }
-        handleClose();
+        onSubmit(user, editUser?.id);
     };
 
     return (
