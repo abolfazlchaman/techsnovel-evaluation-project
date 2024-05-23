@@ -1,4 +1,3 @@
-// features/users/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -23,7 +22,7 @@ const initialState: UserState = {
     status: 'idle',
     error: null,
     page: 1,
-    totalPages: 2,
+    totalPages: 1,
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (page: number) => {
@@ -53,6 +52,24 @@ const userSlice = createSlice({
         setPage: (state, action: PayloadAction<number>) => {
             state.page = action.payload;
         },
+        addUser: (state, action: PayloadAction<User>) => {
+            state.users.push(action.payload);
+            state.totalPages = Math.ceil(state.users.length / 8);
+        },
+        updateUserState: (state, action: PayloadAction<User>) => {
+            const index = state.users.findIndex(user => user.id === action.payload.id);
+            if (index !== -1) {
+                state.users[index] = action.payload;
+            }
+        },
+        deleteUserState: (state, action: PayloadAction<number | undefined>) => {
+            if (action.payload === undefined) {
+                state.users = [];
+            } else {
+                state.users = state.users.filter(user => user.id !== action.payload);
+                state.totalPages = Math.ceil(state.users.length / 8);
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -61,8 +78,10 @@ const userSlice = createSlice({
             })
             .addCase(fetchUsers.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.users = action.payload.data;
+                const fetchedUsers = action.payload.data;
+                state.users = [...state.users, ...fetchedUsers];
                 state.totalPages = action.payload.total_pages;
+                state.users = state.users.filter((user, index, self) => self.findIndex(u => u.id === user.id) === index);
             })
             .addCase(fetchUsers.rejected, (state, action) => {
                 state.status = 'failed';
@@ -84,7 +103,7 @@ const userSlice = createSlice({
     },
 });
 
-export const { setPage } = userSlice.actions;
+export const { setPage, addUser, updateUserState, deleteUserState } = userSlice.actions;
 
 export const selectAllUsers = (state: { users: UserState }) => state.users.users;
 export const getUserStatus = (state: { users: UserState }) => state.users.status;

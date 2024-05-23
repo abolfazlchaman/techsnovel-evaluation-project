@@ -9,9 +9,9 @@ import {
     setPage,
     getPage,
     getTotalPages,
-    deleteUser,
-    updateUser,
-    createUser,
+    deleteUserState,
+    updateUserState,
+    addUser,
     User
 } from '@/lib/features/users/userSlice';
 import { AppDispatch, RootState } from '@/lib/store';
@@ -52,7 +52,7 @@ const UserList: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     const [openForm, setOpenForm] = useState(false);
-    const [editUser, setEditUser] = useState<{ id: number; first_name: string; last_name: string; email: string; avatar: string } | undefined>(undefined);
+    const [editUser, setEditUser] = useState<User | undefined>(undefined);
 
     useEffect(() => {
         dispatch(fetchUsers(page));
@@ -76,10 +76,10 @@ const UserList: React.FC = () => {
     };
 
     const handleDeleteUser = (userId: number) => {
-        dispatch(deleteUser(userId)).then(() => dispatch(fetchUsers(page)));
+        dispatch(deleteUserState(userId));
     };
 
-    const handleEditUser = (user: { id: number; first_name: string; last_name: string; email: string; avatar: string }) => {
+    const handleEditUser = (user: User) => {
         setEditUser(user);
         setOpenForm(true);
     };
@@ -95,22 +95,27 @@ const UserList: React.FC = () => {
 
     const handleReload = () => {
         setLoading(true);
-        dispatch(fetchUsers(page));
+        dispatch(setPage(1));
+        dispatch(deleteUserState());
+        dispatch(fetchUsers(1));
     };
 
     const handleSubmit = (user: Omit<User, 'id'>, id?: number) => {
         if (id) {
-            dispatch(updateUser({ id, user })).then(() => dispatch(fetchUsers(page)));
+            dispatch(updateUserState({ ...user, id }));
         } else {
-            dispatch(createUser(user)).then(() => dispatch(fetchUsers(page)));
+            const newUser = { id: users.length + 1, ...user };
+            dispatch(addUser(newUser));
         }
         handleCloseForm();
     };
 
+    const displayedUsers = users.slice((page - 1) * 8, page * 8);
+
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
-            Techsnovel User List
+                Techsnovel User List
             </Typography>
             <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <Button variant="contained" color="primary" onClick={handleCreateUser} startIcon={<CreateIcon />}>
@@ -175,7 +180,7 @@ const UserList: React.FC = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {users.map(user => (
+                                {displayedUsers.map(user => (
                                     <TableRow key={user.id}>
                                         <TableCell>
                                             <Avatar src={user.avatar} alt={`${user.first_name} ${user.last_name}`} />
