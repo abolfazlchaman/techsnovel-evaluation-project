@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import {
@@ -14,6 +14,7 @@ import { Container, Typography, Box, Card, CardContent, CardMedia, Skeleton } fr
 const UserDetails: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { id } = useParams();
+  const [loading, setLoading] = useState(true);
 
   const user = useSelector((state: RootState) => selectUserDetails(state));
   const status = useSelector((state: RootState) => getUserDetailsStatus(state));
@@ -24,6 +25,15 @@ const UserDetails: React.FC = () => {
       dispatch(fetchUserDetails(Number(id)));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (status === "succeeded" || status === "failed") {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);  // 1-second skeleton delay
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   return (
     <Box
@@ -37,7 +47,7 @@ const UserDetails: React.FC = () => {
         p: 4,
       }}>
       <Container maxWidth="sm">
-        {status === "loading" ? (
+        {loading ? (
           <Box>
             <Skeleton
               variant="rectangular"

@@ -49,6 +49,7 @@ const UserList: React.FC = () => {
     const error = useSelector(getUserError);
     const page = useSelector(getPage);
     const totalPages = useSelector(getTotalPages);
+    const [loading, setLoading] = useState(true);
 
     const [openForm, setOpenForm] = useState(false);
     const [editUser, setEditUser] = useState<{ id: number; first_name: string; last_name: string; email: string; avatar: string } | undefined>(undefined);
@@ -56,6 +57,15 @@ const UserList: React.FC = () => {
     useEffect(() => {
         dispatch(fetchUsers(page));
     }, [dispatch, page]);
+
+    useEffect(() => {
+        if (status === "succeeded" || status === "failed") {
+            const timer = setTimeout(() => {
+                setLoading(false);
+            }, 1000); // 1-second skeleton delay
+            return () => clearTimeout(timer);
+        }
+    }, [status]);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         dispatch(setPage(value));
@@ -84,6 +94,7 @@ const UserList: React.FC = () => {
     };
 
     const handleReload = () => {
+        setLoading(true);
         dispatch(fetchUsers(page));
     };
 
@@ -110,7 +121,7 @@ const UserList: React.FC = () => {
                 </Button>
             </Stack>
             <UserForm open={openForm} handleClose={handleCloseForm} editUser={editUser} onSubmit={handleSubmit} />
-            {status === 'loading' ? (
+            {loading ? (
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
