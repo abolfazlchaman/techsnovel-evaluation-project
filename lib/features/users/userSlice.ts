@@ -72,9 +72,10 @@ const userSlice = createSlice({
                 state.users.push(action.payload);
             })
             .addCase(updateUser.fulfilled, (state, action) => {
-                const index = state.users.findIndex(user => user.id === action.payload.id);
-                if (index !== -1) {
-                    state.users[index] = action.payload;
+                const updatedUser = action.payload;
+                const existingUserIndex = state.users.findIndex(user => user.id === updatedUser.id);
+                if (existingUserIndex !== -1) {
+                    state.users[existingUserIndex] = updatedUser;
                 }
             })
             .addCase(deleteUser.fulfilled, (state, action) => {
