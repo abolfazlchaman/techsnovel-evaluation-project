@@ -30,11 +30,14 @@ import {
     Typography,
     Skeleton,
     IconButton,
-    Button
+    Button,
+    Stack
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import CreateIcon from '@mui/icons-material/Create';
 import UserForm from './UserForm/UserForm';
 import { useRouter } from 'next/navigation';
 
@@ -63,7 +66,7 @@ const UserList: React.FC = () => {
     };
 
     const handleDeleteUser = (userId: number) => {
-        dispatch(deleteUser(userId));
+        dispatch(deleteUser(userId)).then(() => dispatch(fetchUsers(page)));
     };
 
     const handleEditUser = (user: { id: number; first_name: string; last_name: string; email: string; avatar: string }) => {
@@ -80,6 +83,10 @@ const UserList: React.FC = () => {
         setOpenForm(false);
     };
 
+    const handleReload = () => {
+        dispatch(fetchUsers(page));
+    };
+
     const handleSubmit = (user: Omit<User, 'id'>, id?: number) => {
         if (id) {
             dispatch(updateUser({ id, user })).then(() => dispatch(fetchUsers(page)));
@@ -94,9 +101,14 @@ const UserList: React.FC = () => {
             <Typography variant="h4" component="h1" gutterBottom>
             Techsnovel User List
             </Typography>
-            <Button variant="contained" color="primary" onClick={handleCreateUser} sx={{ mb: 2 }}>
-                Add User
-            </Button>
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleCreateUser} startIcon={<CreateIcon />}>
+                    Add User
+                </Button>
+                <Button variant="outlined" color="primary" onClick={handleReload} startIcon={<RefreshIcon />}>
+                    Reload
+                </Button>
+            </Stack>
             <UserForm open={openForm} handleClose={handleCloseForm} editUser={editUser} onSubmit={handleSubmit} />
             {status === 'loading' ? (
                 <TableContainer component={Paper}>
