@@ -26,73 +26,83 @@ const UserDetails: React.FC = () => {
   }, [dispatch, id]);
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{ mt: 4, mb: 4 }}>
-      {status === "loading" ? (
-        <Box>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={200}
-          />
-          <Skeleton
-            variant="text"
-            width="80%"
-            height={40}
-            sx={{ mt: 2 }}
-          />
-          <Skeleton
-            variant="text"
-            width="60%"
-            height={30}
-          />
-          <Skeleton
-            variant="text"
-            width="40%"
-            height={30}
-          />
-        </Box>
-      ) : status === "succeeded" ? (
-        <Card>
-          <CardMedia
-            component="img"
-            height="200"
-            image={user?.avatar}
-            alt={`${user?.first_name} ${user?.last_name}`}
-          />
-          <CardContent>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        bgcolor: "background.default",
+        p: 4,
+      }}>
+      <Container maxWidth="sm">
+        {status === "loading" ? (
+          <Box>
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={200}
+            />
+            <Skeleton
+              variant="text"
+              width="80%"
+              height={40}
+              sx={{ mt: 2 }}
+            />
+            <Skeleton
+              variant="text"
+              width="60%"
+              height={30}
+            />
+            <Skeleton
+              variant="text"
+              width="40%"
+              height={30}
+            />
+          </Box>
+        ) : status === "succeeded" ? (
+          <Card>
+            <CardMedia
+              sx={{ objectFit: "contain" }}
+              component="img"
+              height="200"
+              image={user?.avatar}
+              alt={`${user?.first_name} ${user?.last_name}`}
+            />
+            <CardContent>
+              <Typography
+                variant="h5"
+                component="div">
+                {user?.first_name} {user?.last_name}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary">
+                ID: {user?.id}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary">
+                Email: {user?.email}
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : status === "failed" ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100vh">
             <Typography
-              variant="h5"
-              component="div">
-              {user?.first_name} {user?.last_name}
+              variant="h6"
+              color="error">
+              {error}
             </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary">
-              ID: {user?.id}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary">
-              Email: {user?.email}
-            </Typography>
-          </CardContent>
-        </Card>
-      ) : status === "failed" ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh">
-          <Typography
-            variant="h6"
-            color="error">
-            {error}
-          </Typography>
-        </Box>
-      ) : null}
-    </Container>
+          </Box>
+        ) : null}
+      </Container>
+    </Box>
   );
 };
 
