@@ -8,7 +8,8 @@ import {
     getUserError,
     setPage,
     getPage,
-    getTotalPages
+    getTotalPages,
+    deleteUser
 } from '@/lib/features/users/userSlice';
 import { AppDispatch, RootState } from '@/lib/store';
 import {
@@ -25,9 +26,13 @@ import {
     Container,
     Typography,
     Skeleton,
-    IconButton
+    IconButton,
+    Button
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import UserForm from './UserForm/UserForm';
 import { useRouter } from 'next/navigation';
 
 const UserList: React.FC = () => {
@@ -38,6 +43,9 @@ const UserList: React.FC = () => {
     const error = useSelector((state: RootState) => getUserError(state));
     const page = useSelector((state: RootState) => getPage(state));
     const totalPages = useSelector((state: RootState) => getTotalPages(state));
+
+    const [openForm, setOpenForm] = useState(false);
+    const [editUser, setEditUser] = useState<{ id: number; first_name: string; last_name: string; email: string; avatar: string } | undefined>(undefined);
 
     useEffect(() => {
         dispatch(fetchUsers(page));
@@ -51,11 +59,33 @@ const UserList: React.FC = () => {
         router.push(`/user/${userId}`);
     };
 
+    const handleDeleteUser = (userId: number) => {
+        dispatch(deleteUser(userId));
+    };
+
+    const handleEditUser = (user: { id: number; first_name: string; last_name: string; email: string; avatar: string }) => {
+        setEditUser(user);
+        setOpenForm(true);
+    };
+
+    const handleCreateUser = () => {
+        setEditUser(undefined);
+        setOpenForm(true);
+    };
+
+    const handleCloseForm = () => {
+        setOpenForm(false);
+    };
+
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
-                User List
+            Techsnovel User List
             </Typography>
+            <Button variant="contained" color="primary" onClick={handleCreateUser} sx={{ mb: 2 }}>
+                Add User
+            </Button>
+            <UserForm open={openForm} handleClose={handleCloseForm} editUser={editUser} />
             {status === 'loading' ? (
                 <TableContainer component={Paper}>
                     <Table>
@@ -122,6 +152,12 @@ const UserList: React.FC = () => {
                                         <TableCell>
                                             <IconButton onClick={() => handleViewUser(user.id)}>
                                                 <VisibilityIcon />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleEditUser(user)}>
+                                                <EditIcon />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDeleteUser(user.id)}>
+                                                <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
