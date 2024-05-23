@@ -39,7 +39,41 @@ You can use this application live at [https://techsnovel.vercel.app/](https://te
 
 ```bash
 git clone https://github.com/abolfazlchaman/techsnovel-evaluation-project
+
 cd techsnovel-evaluation-project
 npm install
 npm run dev
+
+Open your browser and navigate to http://localhost:3000.
+
 ```
+
+Project Structure (Summary - not all files included)
+
+bash
+user-management-app/
+│
+├── public/                       # Public assets
+│
+├── src/                          # Source files
+│   ├── components/               # React components
+│   │   ├── UserForm/             # User form component for create and update
+│   │   │   └── UserForm.tsx
+│   │   └── UserList.tsx          # Main user list component
+│   │
+│   ├── lib/                      # Library and utilities
+│   │   ├── features/             # Redux features (slices)
+│   │   │   └── users/            
+│   │   │       └── userSlice.ts  # User slice
+│   │   └── store.ts              # Redux store configuration
+│   │
+│   ├── pages/                    # Next.js pages
+│   │   └── index.tsx             # Main entry page
+│   │
+│   ├── styles/                   # Styles (CSS or SASS)
+│   └── utils/                    # Utility functions
+│
+├── .gitignore                    # Git ignore file
+├── package.json                  # NPM package configuration
+├── README.md                     # Project README file
+└── tsconfig.json                 # TypeScript configuration
