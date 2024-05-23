@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-interface User {
+export interface User {
     id: number;
     email: string;
     first_name: string;
@@ -20,7 +20,7 @@ interface UserState {
 
 const initialState: UserState = {
     users: [],
-    status: 'loading',  // Initialize status to 'loading'
+    status: 'idle',
     error: null,
     page: 1,
     totalPages: 2,
@@ -29,6 +29,21 @@ const initialState: UserState = {
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (page: number) => {
     const response = await axios.get(`https://reqres.in/api/users?page=${page}`);
     return response.data;
+});
+
+export const createUser = createAsyncThunk('users/createUser', async (user: Omit<User, 'id'>) => {
+    const response = await axios.post(`https://reqres.in/api/users`, user);
+    return response.data;
+});
+
+export const updateUser = createAsyncThunk('users/updateUser', async ({ id, user }: { id: number, user: Omit<User, 'id'> }) => {
+    const response = await axios.put(`https://reqres.in/api/users/${id}`, user);
+    return response.data;
+});
+
+export const deleteUser = createAsyncThunk('users/deleteUser', async (id: number) => {
+    await axios.delete(`https://reqres.in/api/users/${id}`);
+    return id;
 });
 
 const userSlice = createSlice({
@@ -52,6 +67,18 @@ const userSlice = createSlice({
             .addCase(fetchUsers.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message || null;
+            })
+            .addCase(createUser.fulfilled, (state, action) => {
+                state.users.push(action.payload);
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                const index = state.users.findIndex(user => user.id === action.payload.id);
+                if (index !== -1) {
+                    state.users[index] = action.payload;
+                }
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.users = state.users.filter(user => user.id !== action.payload);
             });
     },
 });
